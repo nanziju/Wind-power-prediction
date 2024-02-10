@@ -1,0 +1,237 @@
+clc;
+clear;
+
+linewidth = 1.5;
+fontSize = 12;
+
+orignal                = xlsread('shiyaner.xlsx');
+ NPVCNN      = xlsread('NeuralProphet-libsvm.xlsx');
+ NPLIBSVM          = xlsread('NeuralProphet-vmd-libsvm.xlsx');
+NP_ICE_LIBSVM            =xlsread('NeuralProphet-vmd-iceemdan-libsvm.xlsx');
+NP_VMD_ICE_LIBSVM      = xlsread('NeuralProphet-iceemdan-libsvm.xlsx');
+NP_VMD_LIBSVM    =xlsread('np-error-iceemdan-iceemdan-libsvm.xlsx');
+NP_ICE_VMD_LIBSVM      =xlsread('NeuralProphet-iceemdan-vmd-libsvm.xlsx');
+
+figure;
+subplot(2,4,[1 2 3]);
+hold on;
+
+pColor = [[240/255 23/255 22/255]; ...
+          [255/255 142/255 23/255]; ...
+          [209/255 234/255 58/255]; ...
+          [119/255 45/255 134/255]; ...
+          [17/255 133/255 245/255]; ...
+          [81/255 225/255 116/255]; ...
+          [140/255 140/255 100/255]];
+      
+plot(orignal,'color',pColor(1,:),'linewidth', linewidth);
+plot(NPVCNN,'color',pColor(2,:),'linewidth', linewidth);
+plot(NPLIBSVM,'color',pColor(3,:),'linewidth', linewidth);
+plot(NP_ICE_LIBSVM,'color',pColor(4,:),'linewidth', linewidth);
+plot(NP_VMD_ICE_LIBSVM,'color',pColor(5,:),'linewidth', linewidth);
+plot(NP_VMD_LIBSVM,'color',pColor(6,:),'linewidth', linewidth);
+plot(NP_ICE_VMD_LIBSVM,'color',pColor(7,:),'linewidth', linewidth);
+
+xlabel('Time (15min)');
+ylabel('Wind wind power(MV)');
+axis tight;
+set(gca,'FontName','TimesNewRoman','FontSize',fontSize,'Box','on','TickDir','in','linewidth', linewidth);
+legend('Actrol wind power','WTD-NP-Libsvm','WTD-NP-VMD-Libsvm','WTD-NP-VMD-ICEEMDAN-Libsvm','WTD-NP-ICEEMDAN-Libsvm','WTD-NP-ICEEMDAN-ICEEMDAN-Libsvm','WTD-NP-ICEEMDAN-VMD-Libsvm','FontName','TimesNewRoman','FontSize',10,'FontAngle','italic','Box','off');
+
+
+
+subplot(244)
+hold on;
+plot(orignal,orignal,'color',pColor(1,:),'linewidth', linewidth);
+axis tight;
+scatter(orignal, NPVCNN, 'MarkerEdgeColor', pColor(2,:),'linewidth', linewidth);
+scatter(orignal, NPLIBSVM, 'MarkerEdgeColor', pColor(3,:),'linewidth', linewidth);
+scatter(orignal, NP_ICE_LIBSVM, 'MarkerEdgeColor', pColor(4,:),'linewidth', linewidth);
+scatter(orignal, NP_VMD_ICE_LIBSVM, 'MarkerEdgeColor', pColor(5,:),'linewidth', linewidth);
+scatter(orignal, NP_VMD_LIBSVM, 'MarkerEdgeColor', pColor(6,:),'linewidth', linewidth);
+scatter(orignal, NP_ICE_VMD_LIBSVM, 'MarkerEdgeColor', pColor(7,:),'linewidth', linewidth);
+xlabel('Actual values');
+ylabel('Predicted values');
+min = 0;
+max = 17.5;
+xlim([min max]);
+ylim([min max]);
+set(gca,'FontName','TimesNewRoman','FontSize',fontSize,'Box','on','TickDir','in','linewidth', linewidth);
+legend('Actual wind power','WTD-NP-Libsvm','WTD-NP-VMD-Libsvm','WTD-NP-VMD-ICEEMDAN-Libsvm','WTD-NP-ICEEMDAN-Libsvm','WTD-NP-ICEEMDAN-ICEEMDAN-Libsvm','WTD-NP-ICEEMDAN-VMD-Libsvm','FontName','TimesNewRoman','FontSize',10,'FontAngle','italic','Box','off','Location','northwest');
+
+% MSE_test = mean((x - y).^2);
+
+mse_prophet =  mean((orignal-NPVCNN).^2);
+mse_prophet_arima =  mean((orignal-NPLIBSVM).^2);
+mse_neuralprophet =  mean((orignal-NP_ICE_LIBSVM).^2);
+mse_neuralprophet_arima =  mean((orignal-NP_VMD_ICE_LIBSVM).^2);
+mse_mlp =  mean((orignal-NP_VMD_LIBSVM).^2);
+mse_mlp_arima =  mean((orignal-NP_ICE_VMD_LIBSVM).^2);
+
+
+mae_prophet = sum(abs(orignal-NPVCNN))/length(orignal);
+mae_prophet_arima = sum(abs(orignal-NPLIBSVM))/length(orignal);
+mae_neuralprophet = sum(abs(orignal-NP_ICE_LIBSVM))/length(orignal);
+mae_neuralprophet_arima = sum(abs(orignal-NP_VMD_ICE_LIBSVM))/length(orignal);
+mae_mlp = sum(abs(orignal-NP_VMD_LIBSVM))/length(orignal);
+mae_mlp_arima = sum(abs(orignal-NP_ICE_VMD_LIBSVM))/length(orignal);
+
+rmse_prophet = sqrt(sum(abs(orignal-NPVCNN).^2)/length(orignal));
+rmse_prophet_arima = sqrt(sum(abs(orignal-NPLIBSVM).^2)/length(orignal));
+rmse_neuralprophet = sqrt(sum(abs(orignal-NP_ICE_LIBSVM).^2)/length(orignal));
+rmse_neuralprophet_arima = sqrt(sum(abs(orignal-NP_VMD_ICE_LIBSVM).^2)/length(orignal));
+rmse_mlp = sqrt(sum(abs(orignal-NP_VMD_LIBSVM).^2)/length(orignal));
+rmse_mlp_arima = sqrt(sum(abs(orignal-NP_ICE_VMD_LIBSVM).^2)/length(orignal));
+
+nan = find(orignal==0);
+for i = 1:length(nan)
+    orignal(nan(i)-i+1) = []; 
+    NPVCNN(nan(i)-i+1) = []; 
+    NPLIBSVM(nan(i)-i+1) = []; 
+    NP_ICE_LIBSVM(nan(i)-i+1) = []; 
+    NP_VMD_ICE_LIBSVM(nan(i)-i+1) = []; 
+    NP_VMD_LIBSVM(nan(i)-i+1) = [];      
+    NP_ICE_VMD_LIBSVM(nan(i)-i+1) = [];     
+end
+mape_prophet = sum(abs((orignal-NPVCNN)./orignal))/length(orignal);
+mape_prophet_arima = sum(abs((orignal-NPLIBSVM)./orignal))/length(orignal);
+mape_neuralprophet = sum(abs((orignal-NP_ICE_LIBSVM)./orignal))/length(orignal);
+mape_neuralprophet_arima = sum(abs((orignal-NP_VMD_ICE_LIBSVM)./orignal))/length(orignal);
+mape_mlp = sum(abs((orignal-NP_VMD_LIBSVM)./orignal))/length(orignal); 
+mape_mlp_arima = sum(abs((orignal-NP_ICE_VMD_LIBSVM)./orignal))/length(orignal);
+
+R_prophet = corrcoef(orignal,NPVCNN); R2_prophet = R_prophet(1, 2)^2;
+R_prophet_arima = corrcoef(orignal,NPLIBSVM); R2_prophet_arima = R_prophet_arima(1, 2)^2;
+R_neuralprophet = corrcoef(orignal,NP_ICE_LIBSVM);     R2_neuralprophet = R_neuralprophet(1, 2)^2;
+R_neuralprophet_arima = corrcoef(orignal,NP_VMD_ICE_LIBSVM);       R2_neuralprophet_arima = R_neuralprophet_arima(1, 2)^2;
+R_mlp = corrcoef(orignal,NP_VMD_LIBSVM);               R2_mlp = R_mlp(1, 2)^2;
+R_mlp_arima = corrcoef(orignal,NP_ICE_VMD_LIBSVM);     R2_mlp_arima = R_mlp_arima(1, 2)^2;
+
+% R_prophet = corrcoef(orignal-NPVCNN);R2_prophet = R_prophet(1, 2)^2;
+% R2_prophet = sum(abs((orignal-NPVCNN)./orignal))/length(orignal);
+% R2_prophet_arima = sum(abs((orignal-NPLIBSVM)./orignal))/length(orignal);
+% R2_neuralprophet = sum(abs((orignal-libsvm)./orignal))/length(orignal);
+% R2_neuralprophet_arima = sum(abs((orignal-cnn)./orignal))/length(orignal);
+% R2_mlp = sum(abs((orignal-prophet)./orignal))/length(orignal); 
+% R2_mlp_arima = sum(abs((orignal-neuralprophet)./orignal))/length(orignal);
+
+
+bColor = [[17/255 133/255 200/255]; ...
+          [81/255 225/255 116/255]; ...
+          [119/255 45/255 134/255]; ...
+          [245/255 172/255 23/255]; ...
+          [239/255 234/255 58/255]; ...
+          [220/255 23/255 22/255]];
+mse_prophet
+
+
+subplot(245);
+hold on;
+b_mse_prophet = bar(1,mse_prophet);
+set(b_mse_prophet, 'FaceColor', bColor(1,:));
+b_mse_prophet_arima = bar(2,mse_prophet_arima);
+set(b_mse_prophet_arima, 'FaceColor', bColor(2,:));
+b_mse_neuralprophet = bar(3,mse_neuralprophet);
+set(b_mse_neuralprophet, 'FaceColor', bColor(3,:));
+b_mse_neuralprophet_arima = bar(4,mse_neuralprophet_arima);
+set(b_mse_neuralprophet_arima, 'FaceColor', bColor(4,:));
+b_mse_mlp = bar(5,mse_mlp);
+set(b_mse_mlp, 'FaceColor', bColor(5,:));
+b_mse_mlp_arima = bar(6,mse_mlp_arima);
+set(b_mse_mlp_arima, 'FaceColor', bColor(6,:));
+xlabel('Date 1','FontSize',fontSize);
+ylabel('MSE','FontSize',fontSize);
+set(gca,'XTickLabel',[]);
+set(gca,'FontName','TimesNewRoman','FontSize',fontSize,'Box','on','TickDir','in','linewidth', linewidth);
+
+legend('Wdd-Prophet-vmd-cnn','Wdd-NeuralProphet-libsvm','Wdd-NeuralProphet-iceemdan-libsvm','Wdd-NeuralProphet-vmd-iceemdan-libsvm','Wdd-NeuralProphet-vmd-libsvm','Wdd-NeuralProphet-iceemdan-vmd-libsvm','FontName','TimesNewRoman','FontSize',10,'FontAngle','italic','Box','off');
+% hold on;
+% b_mae_prophet = bar(1,mae_prophet);
+% set(b_mae_prophet, 'FaceColor', bColor(1,:));
+% b_mae_prophet_arima = bar(2,mae_prophet_arima);
+% set(b_mae_prophet_arima, 'FaceColor', bColor(2,:));
+% b_mae_neuralprophet = bar(3,mae_neuralprophet);
+% set(b_mae_neuralprophet, 'FaceColor', bColor(3,:));
+% b_mae_neuralprophet_arima = bar(4,mae_neuralprophet_arima);
+% set(b_mae_neuralprophet_arima, 'FaceColor', bColor(4,:));
+% b_mae_mlp = bar(5,mae_mlp);
+% set(b_mae_mlp, 'FaceColor', bColor(5,:));
+% b_mae_mlp_arima = bar(6,mae_mlp_arima);
+% set(b_mae_mlp_arima, 'FaceColor', bColor(6,:));
+% xlabel('Date 1','FontSize',fontSize);
+% ylabel('MAE','FontSize',fontSize);
+% set(gca,'XTickLabel',[]);
+% set(gca,'FontName','TimesNewRoman','FontSize',fontSize,'Box','on','TickDir','in','linewidth', linewidth);
+% legend('NeuralProphet-vmd-cnn','NeuralProphet-libsvm','NeuralProphet-iceemdan-libsvm','NeuralProphet-vmd-iceemdan-libsvm','NeuralProphet-vmd-libsvm','NeuralProphet-iceemdan-vmd-libsvm','FontName','TimesNewRoman','FontSize',10,'FontAngle','italic','Box','off');
+
+
+
+subplot(246);
+hold on;
+b_rmse_prophet = bar(1,rmse_prophet);
+set(b_rmse_prophet, 'FaceColor', bColor(1,:));
+b_rmse_prophet_arima = bar(2,rmse_prophet_arima);
+set(b_rmse_prophet_arima, 'FaceColor', bColor(2,:));
+b_rmse_neuralprophet = bar(3,rmse_neuralprophet);
+set(b_rmse_neuralprophet, 'FaceColor', bColor(3,:));
+b_rmse_neuralprophet_arima = bar(4,rmse_neuralprophet_arima);
+set(b_rmse_neuralprophet_arima, 'FaceColor', bColor(4,:));
+b_rmse_mlp = bar(5,rmse_mlp);
+set(b_rmse_mlp, 'FaceColor', bColor(5,:));
+b_rmse_mlp_arima = bar(6,rmse_mlp_arima);
+set(b_rmse_mlp_arima, 'FaceColor', bColor(6,:));
+xlabel('Date 1','FontSize',fontSize);
+ylabel('RMSE','FontSize',fontSize);
+% ylim([0 1]);
+set(gca,'XTickLabel',[]);
+set(gca,'FontName','TimesNewRoman','FontSize',fontSize,'Box','on','TickDir','in','linewidth', linewidth);
+legend('Wdd-Prophet-vmd-cnn','Wdd-NeuralProphet-libsvm','Wdd-NeuralProphet-iceemdan-libsvm','Wdd-NeuralProphet-vmd-iceemdan-libsvm','Wdd-NeuralProphet-vmd-libsvm','Wdd-NeuralProphet-iceemdan-vmd-libsvm','FontName','TimesNewRoman','FontSize',10,'FontAngle','italic','Box','off');
+
+subplot(247);
+hold on;
+b_mape_prophet = bar(1,mape_prophet);
+set(b_mape_prophet, 'FaceColor', bColor(1,:));
+b_mape_prophet_arima = bar(2,mape_prophet_arima);
+set(b_mape_prophet_arima, 'FaceColor', bColor(2,:));
+b_mape_neuralprophet = bar(3,mape_neuralprophet);
+set(b_mape_neuralprophet, 'FaceColor', bColor(3,:));
+b_mape_neuralprophet_arima = bar(4,mape_neuralprophet_arima);
+set(b_mape_neuralprophet_arima, 'FaceColor', bColor(4,:));
+b_mape_mlp = bar(5,mape_mlp);
+set(b_mape_mlp, 'FaceColor', bColor(5,:));
+b_mape_mlp_arima = bar(6,mape_mlp_arima);
+set(b_mape_mlp_arima, 'FaceColor', bColor(6,:));
+xlabel('Date 1','FontSize',fontSize);
+ylabel('MAPE (%)','FontSize',fontSize);
+% ylim([0 0.09]);
+set(gca,'XTickLabel',[]);
+yTick = get(gca, 'YTick')*100;
+% ylim([0 0.07]);
+set(gca,'YTickLabel',yTick);
+set(gca,'FontName','TimesNewRoman','FontSize',fontSize,'Box','on','TickDir','in','linewidth', linewidth);
+legend('Wdd-Prophet-vmd-cnn','Wdd-NeuralProphet-libsvm','Wdd-NeuralProphet-iceemdan-libsvm','Wdd-NeuralProphet-vmd-iceemdan-libsvm','Wdd-NeuralProphet-vmd-libsvm','Wdd-NeuralProphet-iceemdan-vmd-libsvm','FontName','TimesNewRoman','FontSize',10,'FontAngle','italic','Box','off');
+
+subplot(248);
+hold on;
+b_R2_prophet = bar(1,R2_prophet);
+set(b_R2_prophet, 'FaceColor', bColor(1,:));
+b_R2_prophet_arima = bar(2,R2_prophet_arima);
+set(b_R2_prophet_arima, 'FaceColor', bColor(2,:));
+b_R2_neuralprophet = bar(3,R2_neuralprophet);
+set(b_R2_neuralprophet, 'FaceColor', bColor(3,:));
+b_R2_neuralprophet_arima = bar(4,R2_neuralprophet_arima);
+set(b_R2_neuralprophet_arima, 'FaceColor', bColor(4,:));
+b_R2_mlp = bar(5,R2_mlp);
+set(b_R2_mlp, 'FaceColor', bColor(5,:));
+b_R2_mlp_arima = bar(6,R2_mlp_arima);
+set(b_R2_mlp_arima, 'FaceColor', bColor(6,:));
+xlabel('Date 1','FontSize',fontSize);
+ylabel('R2','FontSize',fontSize);
+ ylim([0.8 1.01]);
+set(gca,'XTickLabel',[]);
+yTick = get(gca, 'YTick');
+% ylim([0 0.07]);
+set(gca,'YTickLabel',yTick);
+set(gca,'FontName','TimesNewRoman','FontSize',fontSize,'Box','on','TickDir','in','linewidth', linewidth);
+legend('Wdd-Prophet-vmd-cnn','Wdd-NeuralProphet-libsvm','Wdd-NeuralProphet-iceemdan-libsvm','Wdd-NeuralProphet-vmd-iceemdan-libsvm','Wdd-NeuralProphet-vmd-libsvm','Wdd-NeuralProphet-iceemdan-vmd-libsvm','FontName','TimesNewRoman','FontSize',10,'FontAngle','italic','Box','off');
+
