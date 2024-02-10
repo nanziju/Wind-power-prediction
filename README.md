@@ -1,1 +1,1 @@
-# CNN-GRU-Attention-Wind-power-prediction-code
+# Wind-power-prediction
